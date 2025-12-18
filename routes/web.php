@@ -1,0 +1,95 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\ExportController;
+use App\Http\Controllers\UpgradeController;
+use App\Http\Controllers\PaymentCallbackController; 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Landing Page
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Dashboard (Authenticated Users)
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+// Profile Routes (from Breeze)
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// ==================== AUTHENTICATED USER ROUTES ====================
+Route::middleware('auth')->group(function () {
+    
+    // Templates
+    Route::get('/templates', [TemplateController::class, 'index'])->name('templates.index');
+    Route::get('/templates/{id}', [TemplateController::class, 'show'])->name('templates.show');
+    Route::post('/templates/{id}/select', [TemplateController::class, 'select'])->name('templates.select');
+    
+    // Portfolios
+    Route::resource('portfolios', PortfolioController::class);
+    
+    // Export
+    Route::get('/export/check-limit', [ExportController::class, 'checkLimit'])->name('export.check-limit');
+    Route::post('/portfolios/{id}/export', [ExportController::class, 'export'])->name('portfolios.export');
+    Route::get('/exports/history', [ExportController::class, 'history'])->name('exports.history');
+    
+    // Upgrade / Payment
+    // Halaman tampilan (UI) tetap di UpgradeController
+    Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
+    
+    // PERBAIKAN: Logic checkout diarahkan ke PaymentCallbackController yang sudah kita fix
+    Route::post('/upgrade/checkout', [UpgradeController::class, 'checkout'])->name('upgrade.checkout');
+    Route::get('/upgrade/finish', [UpgradeController::class, 'paymentFinish'])->name('upgrade.finish');
+    Route::get('/upgrade/pending', [UpgradeController::class, 'paymentPending'])->name('upgrade.pending');
+    Route::get('/upgrade/error', [UpgradeController::class, 'paymentError'])->name('upgrade.error');
+
+    Route::get('/portfolios/{id}/export', [PortfolioController::class, 'exportPdf'])->name('portfolios.export');
+});
+
+// ==================== ADMIN ROUTES ====================
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    
+    // Users Management
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/{id}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::post('/users/{id}/suspend', [AdminUserController::class, 'suspend'])->name('users.suspend');
+    Route::post('/users/{id}/activate', [AdminUserController::class, 'activate'])->name('users.activate');
+    Route::post('/users/{id}/upgrade-pro', [AdminUserController::class, 'upgradeToPro'])->name('users.upgrade-pro');
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    
+    // Templates Management (Coming Soon)
+    Route::get('/templates', function () {
+        return view('coming-soon', ['feature' => 'Template Management']);
+    })->name('templates.index');
+    
+    // Transactions Management (Coming Soon)
+    Route::get('/transactions', function () {
+        return view('coming-soon', ['feature' => 'Transaction Management']);
+    })->name('transactions.index');
+    
+    // Activity Logs (Coming Soon)
+    Route::get('/logs', function () {
+        return view('coming-soon', ['feature' => 'Activity Logs']);
+    })->name('logs.index');
+});
+
+require __DIR__.'/auth.php';
