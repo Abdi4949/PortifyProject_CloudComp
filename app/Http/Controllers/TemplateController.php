@@ -111,9 +111,61 @@ class TemplateController extends Controller
         return view('templates.index', compact('templates'));
     }
 
-    public function show($id)
+public function show($id)
     {
-        return view('templates.show', ['id' => $id]);
+        // 1. TENTUKAN VIEW (Sama seperti sebelumnya)
+        $viewName = match ((int)$id) {
+            1, 4, 12 => 'exports.template1', 
+            2, 11, 16, 17, 19 => 'exports.template2', 
+            7, 10, 15 => 'exports.template3', 
+            6, 9, 14, 18, 20 => 'exports.template4', 
+            3, 5, 8, 13 => 'exports.template5',
+            default => 'exports.template1',
+        };
+
+        // 2. BUAT DUMMY CONTENT (Sama seperti sebelumnya)
+        $dummyContent = [
+            'profile' => [
+                'name' => 'John Doe (Preview)',
+                'role' => 'Creative Designer',
+                'bio' => 'This is a preview of how your bio will look.',
+                'email' => 'hello@example.com',
+                'linkedin' => 'https://linkedin.com/in/johndoe',
+                'image' => null, 
+            ],
+            'skills' => ['UI/UX Design', 'Laravel', 'Tailwind CSS', 'React Native'],
+            'projects' => [
+                [
+                    'title' => 'Project Alpha',
+                    'description' => 'A stunning mobile application built for e-commerce.',
+                    'link' => '#',
+                    'image' => null
+                ],
+                [
+                    'title' => 'Brand Identity',
+                    'description' => 'Rebranding project for a tech startup.',
+                    'link' => '#',
+                    'image' => null
+                ]
+            ]
+        ];
+
+        // 3. MOCK OBJEK PORTFOLIO (PERBAIKAN DI SINI)
+        $dummyPortfolio = new \App\Models\Portfolio();
+        
+        // --- TAMBAHKAN BARIS INI ---
+        $dummyPortfolio->id = 0; // Berikan ID palsu (0) agar route generation tidak error
+        // ---------------------------
+        
+        $dummyPortfolio->title = "Template Preview #" . $id;
+        $dummyPortfolio->template_id = $id;
+
+        // 4. TAMPILKAN VIEW
+        return view($viewName, [
+            'portfolio' => $dummyPortfolio,
+            'content' => $dummyContent,
+            'isPdf' => false 
+        ]);
     }
 
     // === INI BAGIAN PENTING YANG DIAMANKAN ===

@@ -9,6 +9,7 @@ use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\PaymentCallbackController; 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\TransactionController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -44,22 +45,22 @@ Route::middleware('auth')->group(function () {
     // Portfolios
     Route::resource('portfolios', PortfolioController::class);
     
-    // Export
+    // Export (Logic Lama / Data Mining)
     Route::get('/export/check-limit', [ExportController::class, 'checkLimit'])->name('export.check-limit');
     Route::post('/portfolios/{id}/export', [ExportController::class, 'export'])->name('portfolios.export');
     Route::get('/exports/history', [ExportController::class, 'history'])->name('exports.history');
     
     // Upgrade / Payment
-    // Halaman tampilan (UI) tetap di UpgradeController
     Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade');
-    
-    // PERBAIKAN: Logic checkout diarahkan ke PaymentCallbackController yang sudah kita fix
     Route::post('/upgrade/checkout', [UpgradeController::class, 'checkout'])->name('upgrade.checkout');
     Route::get('/upgrade/finish', [UpgradeController::class, 'paymentFinish'])->name('upgrade.finish');
     Route::get('/upgrade/pending', [UpgradeController::class, 'paymentPending'])->name('upgrade.pending');
     Route::get('/upgrade/error', [UpgradeController::class, 'paymentError'])->name('upgrade.error');
 
-    Route::get('/portfolios/{id}/export', [PortfolioController::class, 'exportPdf'])->name('portfolios.export');
+    // EXPORT PDF (FIXED ROUTE NAME)
+    // Saya ubah namanya jadi 'portfolios.exportPdf' agar tidak bentrok dengan baris 49
+    // Dan URL-nya jadi 'export-pdf' agar unik
+    Route::get('/portfolios/{id}/export-pdf', [PortfolioController::class, 'exportPdf'])->name('portfolios.exportPdf');
 });
 
 // ==================== ADMIN ROUTES ====================
@@ -81,10 +82,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         return view('coming-soon', ['feature' => 'Template Management']);
     })->name('templates.index');
     
-    // Transactions Management (Coming Soon)
-    Route::get('/transactions', function () {
-        return view('coming-soon', ['feature' => 'Transaction Management']);
-    })->name('transactions.index');
+    // Transactions Management (FIXED - MENGARAH KE CONTROLLER)
+    // Rute lama dihapus, diganti ke TransactionController
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     
     // Activity Logs (Coming Soon)
     Route::get('/logs', function () {
