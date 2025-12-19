@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\TemplateController; 
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\UpgradeController;
@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentCallbackController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\TransactionController; 
+use App\Http\Controllers\Admin\TemplateController as AdminTemplateController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +38,7 @@ Route::middleware('auth')->group(function () {
 // ==================== AUTHENTICATED USER ROUTES ====================
 Route::middleware('auth')->group(function () {
     
-    // Templates
+    // Templates (User Side)
     Route::get('/templates', [TemplateController::class, 'index'])->name('templates.index');
     Route::get('/templates/{id}', [TemplateController::class, 'show'])->name('templates.show');
     Route::post('/templates/{id}/select', [TemplateController::class, 'select'])->name('templates.select');
@@ -57,9 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/upgrade/pending', [UpgradeController::class, 'paymentPending'])->name('upgrade.pending');
     Route::get('/upgrade/error', [UpgradeController::class, 'paymentError'])->name('upgrade.error');
 
-    // EXPORT PDF (FIXED ROUTE NAME)
-    // Saya ubah namanya jadi 'portfolios.exportPdf' agar tidak bentrok dengan baris 49
-    // Dan URL-nya jadi 'export-pdf' agar unik
+    // EXPORT PDF
     Route::get('/portfolios/{id}/export-pdf', [PortfolioController::class, 'exportPdf'])->name('portfolios.exportPdf');
 });
 
@@ -77,16 +76,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/users/{id}/upgrade-pro', [AdminUserController::class, 'upgradeToPro'])->name('users.upgrade-pro');
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     
-    // Templates Management (Coming Soon)
-    Route::get('/templates', function () {
-        return view('coming-soon', ['feature' => 'Template Management']);
-    })->name('templates.index');
+    // Templates Management (Admin Side)
+    Route::get('/templates', [AdminTemplateController::class, 'index'])->name('templates.index');
+    Route::patch('/templates/{id}/toggle', [AdminTemplateController::class, 'togglePublish'])->name('templates.toggle');
     
-    // Transactions Management (FIXED - MENGARAH KE CONTROLLER)
-    // Rute lama dihapus, diganti ke TransactionController
+    // Transactions Management
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     
-    // Activity Logs (Coming Soon)
+    // Activity Logs
     Route::get('/logs', function () {
         return view('coming-soon', ['feature' => 'Activity Logs']);
     })->name('logs.index');

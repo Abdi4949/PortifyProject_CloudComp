@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Template;   
+use App\Models\Portfolio;
 
 class TemplateController extends Controller
 {
@@ -108,6 +110,9 @@ class TemplateController extends Controller
     public function index()
     {
         $templates = $this->getTemplates();
+        $templates = Template::where('is_published', true) 
+                             ->orderBy('id', 'asc')
+                             ->get();
         return view('templates.index', compact('templates'));
     }
 

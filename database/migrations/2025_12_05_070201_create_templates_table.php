@@ -11,9 +11,12 @@ return new class extends Migration
         Schema::create('templates', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Nama template
-            $table->string('slug')->unique();
+            $table->string('slug')->nullable();
             $table->text('description')->nullable();
+            $table->string('image')->nullable();
             $table->string('thumbnail')->nullable(); // Path gambar preview
+            $table->string('layout')->default('Standard');
+            $table->boolean('is_published')->default(true); // Fitur Publish/Unpublish
             
             // Template Type
             $table->enum('type', ['free', 'pro'])->default('free');

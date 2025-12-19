@@ -6,70 +6,95 @@ use App\Http\Controllers\Controller;
 use App\Models\Template;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str; // Tambahkan ini untuk generate Slug
 
 class TemplateController extends Controller
 {
+    /**
+     * Menampilkan daftar template.
+     */
     public function index()
     {
-        $templates = Template::latest()->paginate(10);
+        // Kita urutkan berdasarkan ID agar rapi
+        $templates = Template::orderBy('id', 'asc')->paginate(10);
         return view('admin.templates.index', compact('templates'));
     }
 
+    /**
+     * Menampilkan form create.
+     */
     public function create()
     {
         return view('admin.templates.create');
     }
 
+    /**
+     * Menyimpan template baru ke database.
+     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'view_path' => 'required|string|max:255', // misal: pdf.templates.modern
-            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'type' => 'required|in:free,pro',
+            'description' => 'nullable|string',
+            'layout' => 'required|string|max:255', // Menggantikan view_path
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Menggantikan thumbnail
+            'type' => 'required|in:free,pro', // Input dari form berupa pilihan Free/Pro
         ]);
 
-        $path = $request->file('thumbnail')->store('templates', 'public');
+        // Upload Gambar
+        $path = $request->file('image')->store('templates', 'public');
 
         Template::create([
             'name' => $request->name,
-            'view_path' => $request->view_path,
-            'thumbnail' => $path,
-            'is_premium' => $request->type === 'pro',
-            'is_active' => true,
+            'slug' => Str::slug($request->name), // Generate slug otomatis
+            'description' => $request->description,
+            'layout' => $request->layout,
+            'image' => $path,
+            'is_premium' => $request->type === 'pro', // Konversi ke Boolean
+            'is_published' => true, // Default langsung publish saat create
         ]);
 
         return redirect()->route('admin.templates.index')
             ->with('success', 'Template created successfully');
     }
 
+    /**
+     * Menampilkan form edit.
+     */
     public function edit(Template $template)
     {
         return view('admin.templates.edit', compact('template'));
     }
 
+    /**
+     * Update data template.
+     */
     public function update(Request $request, Template $template)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'view_path' => 'required|string|max:255',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'description' => 'nullable|string',
+            'layout' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'type' => 'required|in:free,pro',
         ]);
 
         $data = [
             'name' => $request->name,
-            'view_path' => $request->view_path,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+            'layout' => $request->layout,
             'is_premium' => $request->type === 'pro',
-            'is_active' => $request->has('is_active'),
+            // Kita tidak update is_published di sini, tapi di method togglePublish
         ];
 
-        if ($request->hasFile('thumbnail')) {
-            // Delete old thumbnail
-            if ($template->thumbnail) {
-                Storage::disk('public')->delete($template->thumbnail);
+        // Logic Update Gambar
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
+            if ($template->image) {
+                Storage::disk('public')->delete($template->image);
             }
-            $data['thumbnail'] = $request->file('thumbnail')->store('templates', 'public');
+            $data['image'] = $request->file('image')->store('templates', 'public');
         }
 
         $template->update($data);
@@ -78,14 +103,34 @@ class TemplateController extends Controller
             ->with('success', 'Template updated successfully');
     }
 
+    /**
+     * Hapus template.
+     */
     public function destroy(Template $template)
     {
-        if ($template->thumbnail) {
-            Storage::disk('public')->delete($template->thumbnail);
+        if ($template->image) {
+            Storage::disk('public')->delete($template->image);
         }
         $template->delete();
 
         return redirect()->route('admin.templates.index')
             ->with('success', 'Template deleted successfully');
+    }
+
+    /**
+     * FITUR BARU: Toggle Publish / Unpublish
+     * Diakses via route PATCH /admin/templates/{id}/toggle
+     */
+    public function togglePublish($id)
+    {
+        $template = Template::findOrFail($id);
+        
+        // Ubah status kebalikannya (True jadi False, False jadi True)
+        $template->is_published = !$template->is_published;
+        $template->save();
+
+        $status = $template->is_published ? 'Published' : 'Unpublished';
+        
+        return redirect()->back()->with('success', "Template '{$template->name}' is now {$status}.");
     }
 }

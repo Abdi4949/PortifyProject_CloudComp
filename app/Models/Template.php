@@ -22,6 +22,9 @@ class Template extends Model
         'design_config',
         'usage_count',
         'order',
+        'image',
+        'is_published',
+        'layout',
     ];
 
     protected $casts = [
