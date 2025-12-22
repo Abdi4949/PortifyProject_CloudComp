@@ -46,7 +46,7 @@ pipeline {
                 script {
                     echo "Building Docker image for Laravel application..."
                     sh """
-                        docker build -t ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT} .
+                        docker build --platform linux/amd64 -t ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT} .
                         docker tag ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT} ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest
                     """
                 }
