@@ -48,8 +48,8 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
+            'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
@@ -58,15 +58,10 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-
-            // Azure MySQL: require_secure_transport=ON => wajib TLS/SSL
-            'options' => extension_loaded('pdo_mysql') ? [
-                // pastikan env MYSQL_ATTR_SSL_CA diset ke path cert di container
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', '/etc/ssl/certs/mysql-ca.pem'),
-
-                // opsional: paksa verifikasi server cert (lebih aman, bisa kamu matikan kalau bermasalah)
-                // PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
-            ] : [],
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
+            ]) : [],
         ],
 
 
