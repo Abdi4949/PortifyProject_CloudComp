@@ -1,31 +1,48 @@
 #!/bin/sh
-
 set -e
 
 echo "Starting Laravel application..."
 
-# Wait for database to be ready
-echo "Waiting for database connection..."
-until php artisan migrate --force --no-interaction 2>/dev/null; do
+# Fix permissions early
+mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache || true
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache || true
+
+# IMPORTANT: clear caches so new env/config (including SSL options) is applied
+php artisan optimize:clear || true
+rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/packages.php bootstrap/cache/services.php || true
+
+# Start supervisor (nginx + php-fpm) FIRST so Azure warmup doesn't timeout
+echo "Starting supervisor (nginx + php-fpm)..."
+(/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf) &
+
+# Give nginx/php-fpm a moment
+sleep 3
+
+# Wait for DB (with timeout so container still starts even if DB is slow)
+echo "Waiting for database connection (max 120s)..."
+i=0
+until php artisan migrate:status --no-interaction >/dev/null 2>&1; do
+  i=$((i+1))
+  if [ "$i" -ge 60 ]; then
+    echo "DB still not ready after 120s, continuing startup (will retry migrations next restart)."
+    break
+  fi
   echo "Database is unavailable - sleeping"
   sleep 2
 done
 
-echo "Database is up - running migrations"
+# Run migrations (non-fatal; don't block startup forever)
+echo "Running migrations..."
+php artisan migrate --force --no-interaction || echo "Migration failed (will retry on next start)."
 
-# Run migrations
-php artisan migrate --force --no-interaction
-
-# Clear and cache config
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Set proper permissions
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Cache after migrations (non-fatal)
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan view:cache || true
 
 echo "Application ready!"
 
-# Start supervisor
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# Keep container running
+wait
+

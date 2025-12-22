@@ -63,7 +63,7 @@ COPY docker/default.conf /etc/nginx/http.d/default.conf
 
 # Copy MySQL SSL CA cert
 COPY docker/DigiCertGlobalRootCA.crt.pem /etc/ssl/certs/mysql-ca.pem
-
+RUN apk add --no-cache ca-certificates && update-ca-certificates
 
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
