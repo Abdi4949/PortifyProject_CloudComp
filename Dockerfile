@@ -17,6 +17,11 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
+# Create supervisor directories
+RUN mkdir -p /var/log/supervisor /var/run/supervisor \
+    && chmod -R 755 /var/log/supervisor /var/run/supervisor
+
+
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql mysqli gd xml zip bcmath
 
