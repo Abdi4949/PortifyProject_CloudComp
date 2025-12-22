@@ -2,6 +2,7 @@ pipeline {
     agent any
     
     environment {
+	PATH = "/usr/local/bin:${env.PATH}"
         ACR_NAME = 'portifyacr'
         ACR_LOGIN_SERVER = 'portifyacr.azurecr.io'
         IMAGE_NAME = 'portify'
