@@ -61,6 +61,10 @@ RUN chown -R www-data:www-data /var/www/html \
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/default.conf /etc/nginx/http.d/default.conf
 
+# Copy MySQL SSL CA cert
+COPY docker/mysql/DigiCertGlobalRootCA.crt.pem /etc/ssl/certs/mysql-ca.pem
+
+
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

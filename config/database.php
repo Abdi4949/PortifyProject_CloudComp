@@ -58,10 +58,17 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+
+            // Azure MySQL: require_secure_transport=ON => wajib TLS/SSL
+            'options' => extension_loaded('pdo_mysql') ? [
+                // pastikan env MYSQL_ATTR_SSL_CA diset ke path cert di container
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', '/etc/ssl/certs/mysql-ca.pem'),
+
+                // opsional: paksa verifikasi server cert (lebih aman, bisa kamu matikan kalau bermasalah)
+                // PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+            ] : [],
         ],
+
 
         'mariadb' => [
             'driver' => 'mariadb',
