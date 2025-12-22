@@ -1,8 +1,9 @@
+cat ./Jenkinsfile
 pipeline {
     agent any
     
     environment {
-	PATH = "/usr/local/bin:${env.PATH}"
+        PATH = "/usr/local/bin:${env.PATH}"
         ACR_NAME = 'portifyacr'
         ACR_LOGIN_SERVER = 'portifyacr.azurecr.io'
         IMAGE_NAME = 'portify'
@@ -95,16 +96,21 @@ pipeline {
             steps {
                 script {
                     echo "Triggering Azure Web App deployment..."
-                    
+
                     sh """
-                        # Update container image
-                        az webapp config container set \
+                        AZ=/opt/homebrew/bin/az
+
+                        # pastikan subscription benar
+                        \$AZ account set --subscription cc1e4621-be06-45d7-b92f-40f5f52a97e4
+
+                        # update container image
+                        \$AZ webapp config container set \
                             --name ${WEBAPP_NAME} \
                             --resource-group ${RESOURCE_GROUP} \
                             --container-image-name ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT}
-                        
-                        # Restart web app to pull new image
-                        az webapp restart \
+
+                        # restart web app agar pull image baru
+                        \$AZ webapp restart \
                             --name ${WEBAPP_NAME} \
                             --resource-group ${RESOURCE_GROUP}
                     """
