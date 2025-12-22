@@ -59,7 +59,7 @@ pipeline {
                     echo "Testing Docker image..."
                     sh """
                         # Quick test to ensure image builds correctly
-                        docker run --rm --entrypoint php ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT} php -v
+                        docker run --rm --entrypoint php ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT} -v
                     """
                 }
             }
