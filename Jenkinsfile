@@ -79,11 +79,44 @@ pipeline {
         stage('Push to ACR') {
             steps {
                 script {
-                    echo "Pushing images to ACR..."
-                    sh """
-                        docker push ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT}
-                        docker push ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest
-                    """
+                    echo "Pushing images to ACR with retry logic..."
+                    
+                    // Set timeout environment
+                    env.DOCKER_CLIENT_TIMEOUT = '300'
+                    env.COMPOSE_HTTP_TIMEOUT = '300'
+                    
+                    // Push commit SHA tag with retry
+                    retry(3) {
+                        try {
+                            sh """
+                                export DOCKER_CLIENT_TIMEOUT=300
+                                export COMPOSE_HTTP_TIMEOUT=300
+                                echo "Pushing ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT}"
+                                docker push ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT}
+                            """
+                        } catch (Exception e) {
+                            echo "Push failed, retrying in 10 seconds..."
+                            sleep 10
+                            throw e
+                        }
+                    }
+                    
+                    // Push latest tag with retry
+                    retry(3) {
+                        try {
+                            sh """
+                                export DOCKER_CLIENT_TIMEOUT=300
+                                export COMPOSE_HTTP_TIMEOUT=300
+                                echo "Pushing ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest"
+                                docker push ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest
+                            """
+                        } catch (Exception e) {
+                            echo "Push failed, retrying in 10 seconds..."
+                            sleep 10
+                            throw e
+                        }
+                    }
+                    
                     echo "✅ Successfully pushed images:"
                     echo "   - ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GIT_COMMIT_SHORT}"
                     echo "   - ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest"
