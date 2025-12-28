@@ -36,18 +36,25 @@ done
 echo "Running migrations..."
 php artisan migrate --force --no-interaction || echo "Migration failed (will retry on next start)."
 
-# Option 2: Run seeders only if a specific table is empty (RECOMMENDED)
+# Seeder logic with FORCE_SEED support
 echo "Checking if seeding is needed..."
 SEEDED=$(php artisan tinker --execute="echo DB::table('users')->count();" 2>/dev/null || echo "error")
 
-if [ "$SEEDED" = "0" ]; then
+if [ "${FORCE_SEED}" = "true" ]; then
+    echo "🔄 FORCE_SEED enabled - deleting old data and re-seeding..."
+    php artisan tinker --execute="DB::table('users')->truncate(); DB::table('templates')->truncate(); echo 'Data cleared';" 2>/dev/null || true
+    echo "Running fresh seeders..."
+    php artisan db:seed --force --no-interaction || echo "Seeding failed (will retry on next start)."
+    echo "✅ Seeders completed (forced)"
+elif [ "$SEEDED" = "0" ]; then
     echo "Database is empty - running seeders..."
     php artisan db:seed --force --no-interaction || echo "Seeding failed (will retry on next start)."
     echo "✅ Seeders completed"
 elif [ "$SEEDED" = "error" ]; then
     echo "⚠️  Could not check seeder status (table might not exist yet)"
 else
-    echo "Database already has $SEEDED users - skipping seeders"
+    echo "ℹ️  Database already has $SEEDED users - skipping seeders"
+    echo "   Set FORCE_SEED=true to force re-seed"
 fi
 
 # Cache after migrations and seeding (non-fatal)
