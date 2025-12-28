@@ -8,53 +8,77 @@ use App\Models\Template;
 use App\Models\UserPortfolio;
 use App\Models\Transaction;
 use App\Models\ActivityLog;
+use App\Models\Visit; 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
+use Carbon\Carbon; 
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Statistics
         $stats = [
             'total_users' => User::count(),
-            'free_users' => User::where('subscription_type', 'free')->count(),
-            'pro_users' => User::where('subscription_type', 'pro')->count(),
+            
+            // FIX 1: User dicek berdasarkan kolom 'account_type' (sesuai screenshot tabel users)
+            'free_users' => User::where('account_type', 'free')->count(),
+            'pro_users' => User::where('account_type', 'pro')->count(),
+
             'total_portfolios' => UserPortfolio::count(),
-            'total_templates' => Template::count(),
+            
+            // FIX 2: Template dicek berdasarkan kolom 'is_published' bernilai 1 (sesuai screenshot tabel templates)
+            'total_templates' => Template::where('is_published', 1)->count(),
+            
             'total_transactions' => Transaction::count(),
             'total_revenue' => Transaction::where('status', 'success')->sum('total_amount'),
             'pending_transactions' => Transaction::where('status', 'pending')->count(),
         ];
         
-        // Recent Users
         $recentUsers = User::latest()->take(5)->get();
         
-        // Recent Transactions
         $recentTransactions = Transaction::with('user')
             ->latest()
             ->take(5)
             ->get();
         
-        // Activity Logs (Export Attempts & Limit Reached)
         $exportLogs = ActivityLog::whereIn('type', ['export_limit_reached', 'premium_template_attempt'])
             ->with('user')
             ->latest()
             ->take(10)
             ->get();
-        
-        // Chart Data: Users Growth (Last 7 days)
-        $usersGrowth = User::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-            ->where('created_at', '>=', now()->subDays(7))
-            ->groupBy('date')
-            ->orderBy('date')
+
+        // Chart Kunjungan (Tetap menggunakan perbaikan DATE)
+        $startDate = Carbon::now()->subDays(7)->startOfDay();
+
+        $visits = Visit::select(
+                DB::raw('DATE(visit_date) as date'), 
+                DB::raw('count(*) as count')
+            )
+            ->where('visit_date', '>=', $startDate)
+            ->groupBy(DB::raw('DATE(visit_date)')) 
+            ->orderBy('date', 'ASC')
             ->get();
+
+        $labels = [];
+        $data = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $displayDate = Carbon::now()->subDays($i)->format('d M'); 
+            
+            $found = $visits->firstWhere('date', $date);
+
+            $labels[] = $displayDate;           
+            $data[] = $found ? $found->count : 0; 
+        }
         
         return view('admin.dashboard', compact(
             'stats',
             'recentUsers',
             'recentTransactions',
             'exportLogs',
-            'usersGrowth'
+            'labels', 
+            'data'    
         ));
     }
 }

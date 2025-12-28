@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\TransactionController; 
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController; 
+use App\Http\Controllers\GoogleAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,5 +89,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         return view('coming-soon', ['feature' => 'Activity Logs']);
     })->name('logs.index');
 });
+
+// Route untuk melempar ke Google
+Route::get('auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
+
+// Route untuk callback dari Google
+Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 
 require __DIR__.'/auth.php';

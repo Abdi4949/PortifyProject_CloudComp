@@ -79,7 +79,6 @@
         
         <div class="absolute inset-0 z-0">
             <div class="absolute inset-0 bg-gray-900/80 z-10"></div>
-            
             <video autoplay muted loop playsinline class="w-full h-full object-cover">
                 <source src="{{ asset('videos/bg-fluid.mp4') }}" type="video/mp4">
             </video>
@@ -148,7 +147,6 @@
                     <h3 class="text-lg font-bold mb-2">Lightning Fast</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">Create your portfolio in just 5 minutes. No coding skills required.</p>
                 </div>
-
                 <div class="glass p-6 rounded-3xl card-hover">
                     <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mb-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +156,6 @@
                     <h3 class="text-lg font-bold mb-2">Beautiful Templates</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">Choose from 50+ professionally designed templates.</p>
                 </div>
-
                 <div class="glass p-6 rounded-3xl card-hover">
                     <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mb-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,7 +165,6 @@
                     <h3 class="text-lg font-bold mb-2">Instant PDF Export</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">Download your portfolio as a professional PDF instantly.</p>
                 </div>
-
                 <div class="glass p-6 rounded-3xl card-hover">
                     <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mb-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +174,6 @@
                     <h3 class="text-lg font-bold mb-2">Secure & Private</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">Your data is encrypted and secure. We never share your information.</p>
                 </div>
-
                 <div class="glass p-6 rounded-3xl card-hover">
                     <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mb-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +183,6 @@
                     <h3 class="text-lg font-bold mb-2">Add Your Projects</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">Showcase your work with project galleries and descriptions.</p>
                 </div>
-
                 <div class="glass p-6 rounded-3xl card-hover">
                     <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mb-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,9 +204,13 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass rounded-3xl overflow-hidden card-hover">
-                    <div class="h-48 bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                        <span class="text-5xl">📄</span>
+                
+                <div class="glass rounded-3xl overflow-hidden card-hover group">
+                    <div class="h-48 overflow-hidden relative bg-gray-800">
+                        <img src="{{ asset('images/modern-minimal.jpg') }}" 
+                             alt="Modern Minimal" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center\'><span class=\'text-5xl\'>📄</span></div>'">
                     </div>
                     <div class="p-5">
                         <span class="px-2.5 py-1 bg-green-500 text-xs font-semibold rounded-full">FREE</span>
@@ -221,25 +219,31 @@
                     </div>
                 </div>
 
-                <div class="glass rounded-3xl overflow-hidden card-hover">
-                    <div class="h-48 bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                        <span class="text-5xl">✨</span>
+                <div class="glass rounded-3xl overflow-hidden card-hover group">
+                    <div class="h-48 overflow-hidden relative bg-gray-800">
+                        <img src="{{ asset('images/classic-pro.jpg') }}" 
+                             alt="Classic Professional" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center\'><span class=\'text-5xl\'>✨</span></div>'">
                     </div>
                     <div class="p-5">
-                        <span class="px-2.5 py-1 bg-purple-500 text-xs font-semibold rounded-full">PRO</span>
-                        <h3 class="text-lg font-bold mt-2">Creative Portfolio</h3>
-                        <p class="text-gray-400 text-sm mt-1.5 leading-relaxed">Eye-catching design for creative professionals</p>
+                        <span class="px-2.5 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full">PRO</span>
+                        <h3 class="text-lg font-bold mt-2">Classic Professional</h3>
+                        <p class="text-gray-400 text-sm mt-1.5 leading-relaxed">Traditional CV style template suitable for corporate</p>
                     </div>
                 </div>
 
-                <div class="glass rounded-3xl overflow-hidden card-hover">
-                    <div class="h-48 bg-gradient-to-br from-pink-600 to-red-600 flex items-center justify-center">
-                        <span class="text-5xl">🎨</span>
+                <div class="glass rounded-3xl overflow-hidden card-hover group">
+                    <div class="h-48 overflow-hidden relative bg-gray-800">
+                        <img src="{{ asset('images/simple-resume.jpg') }}" 
+                             alt="Simple Resume" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-gradient-to-br from-pink-600 to-red-600 flex items-center justify-center\'><span class=\'text-5xl\'>🎨</span></div>'">
                     </div>
                     <div class="p-5">
-                        <span class="px-2.5 py-1 bg-purple-500 text-xs font-semibold rounded-full">PRO</span>
-                        <h3 class="text-lg font-bold mt-2">Designer Showcase</h3>
-                        <p class="text-gray-400 text-sm mt-1.5 leading-relaxed">Perfect for showcasing design projects</p>
+                        <span class="px-2.5 py-1 bg-green-500 text-xs font-semibold rounded-full">FREE</span>
+                        <h3 class="text-lg font-bold mt-2">Simple Resume</h3>
+                        <p class="text-gray-400 text-sm mt-1.5 leading-relaxed">Straightforward resume template focusing on content</p>
                     </div>
                 </div>
             </div>
@@ -283,7 +287,7 @@
                             Basic support
                         </li>
                     </ul>
-                    <a href="{{ route('register') }}" class="block w-full py-2.5 bg-white text-gray-900 rounded-2xl font-semibold text-sm text-center hover:bg-gray-100 transition">
+                    <a href="{{ route('register') }}" class="block w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-center hover:shadow-2xl transition">
                         Get Started Free
                     </a>
                 </div>

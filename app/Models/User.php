@@ -95,13 +95,12 @@ class User extends Authenticatable
     
     public function isPro(): bool
     {
-        // Kita konsistenkan pakai account_type sesuai controller sebelumnya
         return $this->account_type === 'pro';
     }
 
     public function isFree(): bool
     {
-        return $this->account_type === 'free'; // atau default null
+        return $this->account_type === 'free'; 
     }
 
     public function isAdmin(): bool

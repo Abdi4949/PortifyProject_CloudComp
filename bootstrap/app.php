@@ -15,15 +15,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
-        // 1. Alias Middleware Kamu
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'premium.check' => CheckPremiumAccess::class,
         ]);
 
-        // 2. Disable CSRF (Opsional jika pakai api.php, tapi aman ditambahkan)
         $middleware->validateCsrfTokens(except: [
-            'api/midtrans-notification', // Sesuai route di api.php
+            'api/midtrans-notification', 
+        ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackVisitor::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

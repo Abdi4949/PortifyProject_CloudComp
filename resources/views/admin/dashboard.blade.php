@@ -41,8 +41,8 @@
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-400 mb-1">Active Portfolios</p>
-                                <p class="text-3xl font-bold text-white">{{ number_format($stats['total_portfolios']) }}</p>
+                                <p class="text-sm font-medium text-gray-400 mb-1">Available Templates</p>
+                                <p class="text-3xl font-bold text-white">{{ number_format($stats['total_templates']) }}</p>
                             </div>
                             <div class="p-3 bg-indigo-900/50 rounded-lg">
                                 <svg class="h-6 w-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@
                             </div>
                         </div>
                         <div class="mt-4 text-xs text-gray-500">
-                            Based on <span class="font-semibold text-gray-300">{{ $stats['total_templates'] }}</span> available templates
+                            Used in <span class="font-semibold text-gray-300">{{ $stats['total_portfolios'] }}</span> user portfolios
                         </div>
                     </div>
                 </div>
@@ -122,6 +122,23 @@
                 </div>
             </div>
             @endif
+
+            <div class="mb-8 bg-gray-800 overflow-hidden rounded-xl shadow-lg border border-gray-700 transition duration-300 hover:border-gray-600">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-white">
+                            Visitor Traffic (Realtime)
+                        </h3>
+                        <span class="px-3 py-1 text-xs font-semibold text-purple-400 bg-purple-900/50 border border-purple-800 rounded-full">
+                            Last 7 Days
+                        </span>
+                    </div>
+                    
+                    <div class="relative h-80 w-full">
+                        <canvas id="visitorChart"></canvas>
+                    </div>
+                </div>
+            </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
@@ -231,7 +248,84 @@
 
                 </div>
             </div>
-
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('visitorChart').getContext('2d');
+            
+            // Konfigurasi untuk Dark Mode
+            const visitorChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode($labels) !!}, 
+                    datasets: [{
+                        label: 'Jumlah Pengunjung', 
+                        data: {!! json_encode($data) !!}, 
+                        
+                        // Warna Ungu (Purple-500/600) sesuai tema Pro Dashboard kamu
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)', 
+                        borderColor: '#8b5cf6',       
+                        borderWidth: 3,
+                        pointBackgroundColor: '#1f2937', // Warna gelap (Gray-800)
+                        pointBorderColor: '#8b5cf6',
+                        pointHoverBackgroundColor: '#8b5cf6',
+                        pointHoverBorderColor: '#ffffff',
+                        fill: true,          
+                        tension: 0.4         
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#9ca3af', // Gray-400
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(17, 24, 39, 0.9)', // Gray-900
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(75, 85, 99, 0.5)', // Gray-600
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(55, 65, 81, 0.5)', // Gray-700 (Grid Gelap)
+                                borderDash: [5, 5]
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                color: '#9ca3af', // Gray-400
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false 
+                            },
+                            ticks: {
+                                color: '#9ca3af', // Gray-400
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

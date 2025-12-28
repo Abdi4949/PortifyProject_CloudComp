@@ -16,7 +16,7 @@ class TemplateController extends Controller
     public function index()
     {
         // Kita urutkan berdasarkan ID agar rapi
-        $templates = Template::orderBy('id', 'asc')->paginate(10);
+        $templates = Template::orderBy('id', 'asc')->get();
         return view('admin.templates.index', compact('templates'));
     }
 
