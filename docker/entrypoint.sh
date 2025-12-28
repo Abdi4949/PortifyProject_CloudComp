@@ -36,7 +36,21 @@ done
 echo "Running migrations..."
 php artisan migrate --force --no-interaction || echo "Migration failed (will retry on next start)."
 
-# Cache after migrations (non-fatal)
+# Option 2: Run seeders only if a specific table is empty (RECOMMENDED)
+echo "Checking if seeding is needed..."
+SEEDED=$(php artisan tinker --execute="echo DB::table('users')->count();" 2>/dev/null || echo "error")
+
+if [ "$SEEDED" = "0" ]; then
+    echo "Database is empty - running seeders..."
+    php artisan db:seed --force --no-interaction || echo "Seeding failed (will retry on next start)."
+    echo "✅ Seeders completed"
+elif [ "$SEEDED" = "error" ]; then
+    echo "⚠️  Could not check seeder status (table might not exist yet)"
+else
+    echo "Database already has $SEEDED users - skipping seeders"
+fi
+
+# Cache after migrations and seeding (non-fatal)
 php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
@@ -45,4 +59,3 @@ echo "Application ready!"
 
 # Keep container running
 wait
-
