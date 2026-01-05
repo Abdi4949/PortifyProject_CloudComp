@@ -32,9 +32,17 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($templates as $template)
                     @php
-                        // Logic check pro vs free
-                        // Prioritaskan data dari database jika ada key 'is_premium', jika tidak fallback ke ID > 5
-                        $isPro = isset($template['is_premium']) ? $template['is_premium'] : ($template['id'] > 5);
+                        // LOGIC PERBAIKAN:
+                        // Template dianggap PRO jika:
+                        // 1. Kolom 'is_premium' bernilai 1/true
+                        // 2. ATAU Kolom 'type' bernilai 'pro'
+                        // 3. ATAU ID template > 5 (Fallback manual sesuai requestmu)
+                        
+                        $isPremiumDb = ($template['is_premium'] ?? 0);
+                        $typeDb = strtolower($template['type'] ?? '');
+                        
+                        $isPro = ($isPremiumDb == 1) || ($typeDb === 'pro') || ($template['id'] > 5);
+                        
                         $userCanAccess = !$isPro || (Auth::user()->account_type === 'pro');
                     @endphp
 
