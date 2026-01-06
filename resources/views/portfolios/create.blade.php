@@ -63,7 +63,7 @@
             </div>
             
             <p class="mt-6 text-center text-xs text-slate-500">
-                You can change this title anytime later from your dashboard.
+                You can change this title anytime later from your dashboard
             </p>
         </div>
     </div>
