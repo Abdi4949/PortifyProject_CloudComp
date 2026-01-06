@@ -56,7 +56,7 @@
 
                 <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-700 bg-slate-800/50">
-                        <h3 class="text-lg font-bold text-white">2. Personal Information</h3>
+                        <h3 class="text-lg font-bold text-white">2. Personal Information.</h3>
                     </div>
                     
                     <div class="p-6 space-y-6">
