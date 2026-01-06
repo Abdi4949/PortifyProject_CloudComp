@@ -10,6 +10,7 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache || true
 
 # IMPORTANT: clear caches so new env/config is applied
 php artisan optimize:clear || true
+
 rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/packages.php bootstrap/cache/services.php || true
 
 # Start supervisor (nginx + php-fpm) FIRST
@@ -65,6 +66,7 @@ fi
 php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
+php artisan storage:link || true
 
 echo "Application ready!"
 
